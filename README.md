@@ -8,53 +8,53 @@
 [![Dataset](https://img.shields.io/badge/Dataset-Olist_E--Commerce-F7931E?style=for-the-badge)](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 [![ROI](https://img.shields.io/badge/Net%20Margin-%2B%E2%82%AC620k%20%2F%20Year-emerald?style=for-the-badge&logo=moneygram&logoColor=white)](https://github.com)
 
-**A production-ready Safe Reinforcement Learning (RL) architecture for Dynamic Pricing in E-Commerce.**
+**Eine produktionsreife Safe Reinforcement Learning (RL) Architektur für dynamisches Pricing im E-Commerce.**
 
-*Optimizes pricing strategies using a Markov Decision Process (MDP) while strictly adhering to business logic via deterministic Action Masking.*
+*Optimiert Preisstrategien mithilfe eines Markow-Entscheidungsprozesses (MDP) und hält sich durch deterministisches Action Masking strikt an Geschäftslogik und Constraints.*
 
 ---
 </div>
 
-## 💼 Business Value & CFO Directives
+## 💼 Business Value & CFO-Vorgaben
 
-Deploying RL in live retail environments carries massive financial risk if the agent hallucinates. This engine guarantees mathematical safety constraints:
+Der Einsatz von RL im Live-Retail birgt massive finanzielle Risiken, falls der Agent "halluziniert". Diese Engine garantiert mathematische Sicherheitsbeschränkungen:
 
 <table>
   <tr>
-    <td><strong>📈 Net Margin Expansion</strong></td>
-    <td>Projected impact of <strong>+ 620,000 € / year</strong> through optimized pricing policies.</td>
+    <td><strong>📈 Netto-Margenwachstum</strong></td>
+    <td>Prognostizierter Impact von <strong>+ 620.000 € / Jahr</strong> durch optimierte Preisstrategien.</td>
   </tr>
   <tr>
-    <td><strong>🛡️ Margin Floors</strong></td>
-    <td>Hard cut-off at $Cost \times 1.10$. Guarantees that <strong>no neural network action can ever breach this limit</strong>.</td>
+    <td><strong>🛡️ Margen-Untergrenzen</strong></td>
+    <td>Harter Cut-off bei $Cost \times 1.10$. Garantiert, dass <strong>keine Aktion des neuronalen Netzes diese Grenze jemals unterschreiten kann</strong>.</td>
   </tr>
   <tr>
     <td><strong>🔌 Legacy ERP Fallbacks</strong></td>
-    <td>Protects against negative inventory sync issues and competitor API outages by selectively masking discrete discount brackets (-10%, -5% → -∞ logits).</td>
+    <td>Schützt vor negativen Bestands-Synchronisationsfehlern und API-Ausfällen der Konkurrenz durch selektives Maskieren diskreter Rabattstufen (z. B. -10%, -5% $\rightarrow -\infty$ Logits).</td>
   </tr>
 </table>
 
 ---
 
-## 🏗️ Technical Architecture & Core Components
+## 🏗️ Technische Architektur & Kernkomponenten
 
-| Component | Path / Detail | Description & Core Logic |
+| Komponente | Dateipfad / Detail | Beschreibung & Core Logic |
 | :--- | :--- | :--- |
-| **🧠 MDP Formulation** | `State`, `Action`, `Reward` | **State Space ($S$):** Normalized features preventing data leakage ($t_{expiry}$, competitor index, inventory).<br>**Action Space ($A$):** Discrete brackets ({-10%, -5%, 0%, +5%, +10%}) for robust logit-level action masking before the Softmax layer.<br>**Reward ($R$):** Balances margin optimization and conversion probability, penalizing unsold near-expiry inventory. |
-| **📊 Off-Policy Evaluation** | `OPE` | Policy superiority is proven offline using the **Doubly Robust Estimator ($\hat{V}_{DR}$)** before any live deployment. |
-| **⚡ Inference Latency** | `Redis` & `ONNX` | Feature-Fetching via Redis (< 5ms); PyTorch Model exported as ONNX-Graph for ultra-fast C++ execution (**< 50ms total roundtrip**). |
-| **🛑 Execution Guards** | `src/rl_guards.py` | Intercepts the RL agent's `step()` function. Successfully blocked thousands of fatal ERP synchronization errors during simulation. |
+| **🧠 MDP Formulierung** | `State`, `Action`, `Reward` | **Zustandsraum ($S$):** Normalisierte Features zur Verhinderung von Data Leakage ($t_{expiry}$, Wettbewerber-Index, Lagerbestand).<br>**Aktionsraum ($A$):** Diskrete Stufen ({-10%, -5%, 0%, +5%, +10%}) für robustes *Logit-Level Action Masking* vor dem Softmax-Layer.<br>**Belohnung ($R$):** Balanciert Margen-Optimierung und Conversion-Wahrscheinlichkeit, bestraft unverkaufte Ware kurz vor Ablaufdatum. |
+| **📊 Off-Policy Evaluation** | `OPE` | Die Überlegenheit der Policy wird vor jedem Live-Deployment offline mittels des **Doubly Robust Estimators ($\hat{V}_{DR}$)** mathematisch bewiesen. |
+| **⚡ Inference Latency** | `Redis` & `ONNX` | Feature-Fetching über Redis (< 5ms); PyTorch-Modell als ONNX-Graph exportiert für ultraschnelle C++ Ausführung (**< 50ms Total Roundtrip**). |
+| **🛑 Execution Guards** | `src/rl_guards.py` | Fängt die `step()`-Funktion des RL-Agenten ab. Hat in Simulationen erfolgreich tausende fatale ERP-Synchronisationsfehler blockiert. |
 
 ---
 
 ## 🚀 Execution & Audit
 
 <details>
-<summary><b>🛠️ System Audit & Testing (Click to expand)</b></summary>
+<summary><b>🛠️ System Audit & Testing (Hier klicken zum Aufklappen)</b></summary>
 
-### Intercepting the Agent
-The `src/rl_guards.py` module acts as the ultimate safety net. It demonstrates the critical necessity of Safe RL wrappers in financial applications by mathematically preventing invalid actions from reaching the legacy ERP system.
+### Den Agenten abfangen
+Das `src/rl_guards.py` Modul fungiert als ultimatives Sicherheitsnetz. Es beweist die absolute Notwendigkeit von Safe RL-Wrappern in Finanzanwendungen, indem es mathematisch verhindert, dass ungültige Aktionen das Legacy-ERP-System jemals erreichen können.
 
 ```bash
-# Verify the action masking and safety constraints
+# Action Masking und Sicherheits-Constraints verifizieren
 pytest tests/test_rl_guards.py -v
